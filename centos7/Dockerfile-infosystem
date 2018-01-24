@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-FROM cream-service
+FROM cream-service:centos7
 
 ARG info_generic_version
 ARG info_pbs_version

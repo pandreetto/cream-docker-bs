@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-FROM service-base
+FROM service-base:centos7
 
 ARG cream_common_version
 ARG cream_api_version

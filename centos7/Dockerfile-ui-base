@@ -7,7 +7,7 @@
 #
 ###############################################################################
 
-FROM devel-base
+FROM devel-base:centos7
 
 ARG jobman_exc_version
 ARG classad_utils_version

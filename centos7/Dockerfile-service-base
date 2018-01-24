@@ -7,7 +7,7 @@
 #
 ###############################################################################
 
-FROM devel-base
+FROM devel-base:centos7
 
 ARG jdlapij_version
 ARG cream_utils_version

@@ -8,7 +8,7 @@
 #
 ###############################################################################
 
-FROM ui-base
+FROM ui-base:centos7
 
 ARG jdl_apic_version
 ARG cream_apic_version
