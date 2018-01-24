@@ -1,0 +1,31 @@
+###############################################################################
+#  ui-base
+#
+#  Required arguments:
+#    jobman_exc_version
+#    classad_utils_version
+#
+###############################################################################
+
+FROM devel-base:sl6
+
+ARG jobman_exc_version
+ARG classad_utils_version
+
+LABEL jobman.exception.version=${jobman_exc_version} \
+      classad.utils.version=${classad_utils_version}
+
+RUN git clone https://github.com/italiangrid/jobman-exception /var/lib/release/projects/jobman-exception && \
+    cd /var/lib/release/projects/jobman-exception && git checkout ${jobman_exc_version} && \
+    mkdir build && cd build && cmake .. && make rpm && \
+    rpm -i /var/lib/release/projects/jobman-exception/build/rpmbuild/RPMS/x86_64/*.rpm && \
+    cp /var/lib/release/projects/jobman-exception/build/rpmbuild/RPMS/x86_64/*.rpm \
+       /var/lib/release/dist/CREAM-UI/sl6/x86_64/base
+
+RUN git clone https://github.com/italiangrid/classad-utils /var/lib/release/projects/classad-utils && \
+    cd /var/lib/release/projects/classad-utils && git checkout ${classad_utils_version} && \
+    mkdir build && cd build && cmake .. && make rpm && \
+    rpm -i /var/lib/release/projects/classad-utils/build/rpmbuild/RPMS/x86_64/*.rpm && \
+    cp /var/lib/release/projects/classad-utils/build/rpmbuild/RPMS/x86_64/*.rpm \
+       /var/lib/release/dist/CREAM-UI/sl6/x86_64/base
+
