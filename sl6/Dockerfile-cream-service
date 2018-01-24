@@ -1,0 +1,56 @@
+###############################################################################
+#  cream-service
+#
+#  Required arguments:
+#    cream_common_version
+#    cream_api_version
+#    cream_version
+#    canl_tomcat_version
+#    blah_version
+#
+###############################################################################
+
+FROM service-base:sl6
+
+ARG cream_common_version
+ARG cream_api_version
+ARG cream_version
+ARG canl_tomcat_version
+ARG blah_version
+
+LABEL cream.common.version=${cream_common_version} \
+      cream.api.version=${cream_api_version} \
+      cream.version=${cream_version} \
+      canl.tomcat.version=${canl_tomcat_version} \
+      blah.version=${blah_version}
+
+RUN git clone https://github.com/italiangrid/cream-common /var/lib/release/projects/cream-common && \
+    cd /var/lib/release/projects/cream-common && git checkout ${cream_common_version} && \
+    mvn -Drpm.repackaging=true -DskipTests install && \
+    cp /var/lib/release/projects/cream-common/target/rpmbuild/RPMS/noarch/*.rpm \
+       /var/lib/release/dist/CREAM/sl6/noarch/base
+
+RUN git clone https://github.com/italiangrid/cream-api-java /var/lib/release/projects/cream-api-java && \
+    cd /var/lib/release/projects/cream-api-java && git checkout ${cream_api_version} && \
+    mvn -Drpm.repackaging=true -DskipTests install && \
+    cp /var/lib/release/projects/cream-api-java/target/rpmbuild/RPMS/noarch/*.rpm \
+       /var/lib/release/dist/CREAM/sl6/noarch/base
+
+RUN git clone https://github.com/italiangrid/cream /var/lib/release/projects/cream && \
+    cd /var/lib/release/projects/cream && git checkout ${cream_version} && \
+    mvn -Drpm.repackaging=true -DskipTests install && \
+    cp /var/lib/release/projects/cream/target/rpmbuild/RPMS/noarch/*.rpm \
+       /var/lib/release/dist/CREAM/sl6/noarch/base
+
+RUN git clone https://github.com/pandreetto/canl-java-tomcat /var/lib/release/projects/canl-java-tomcat && \
+    cd /var/lib/release/projects/canl-java-tomcat && git checkout ${canl_tomcat_version} && \
+    sed -i 's|/tmp/m2-repository|/root/.m2/repository|g' maven-settings.xml && make rpm && \
+    cp /var/lib/release/projects/canl-java-tomcat/rpmbuild/RPMS/noarch/*.rpm \
+       /var/lib/release/dist/CREAM/sl6/noarch/base
+
+RUN git clone https://github.com/prelz/BLAH /var/lib/release/projects/BLAH && \
+    cd /var/lib/release/projects/BLAH && git checkout ${blah_version} && \
+    mkdir build && cd build && cmake .. && make BLAH_rpm && \
+    cp /var/lib/release/projects/BLAH/build/RPM/RPMS/x86_64/*.rpm \
+       /var/lib/release/dist/CREAM/sl6/x86_64/base
+
