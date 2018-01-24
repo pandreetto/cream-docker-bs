@@ -8,7 +8,7 @@ RUN yum -y install wget epel-release
 
 RUN yum -y install cmake createrepo gcc-c++ git doxygen chrpath docbook-style-xsl \
                    make maven pkgconfig rpm-build libxslt libxml2-devel boost-devel c-ares-devel \
-                   condor-classads-devel glite-jobid-api-c-devel glite-jobid-api-cpp-devel log4cpp-devel \
+                   classads-devel glite-jobid-api-c-devel glite-jobid-api-cpp-devel log4cpp-devel \
                    glite-lbjp-common-gsoap-plugin-devel globus-callout-devel globus-common-devel \
                    globus-ftp-client-devel globus-ftp-control-devel globus-gsi-callback-devel \
                    globus-gsi-cert-utils-devel globus-gsi-credential-devel globus-gsi-openssl-error-devel \

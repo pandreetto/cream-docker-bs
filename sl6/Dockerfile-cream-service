@@ -50,7 +50,8 @@ RUN git clone https://github.com/pandreetto/canl-java-tomcat /var/lib/release/pr
 
 RUN git clone https://github.com/prelz/BLAH /var/lib/release/projects/BLAH && \
     cd /var/lib/release/projects/BLAH && git checkout ${blah_version} && \
-    mkdir build && cd build && cmake .. && make BLAH_rpm && \
+    sed -i 's|project(BLAH)|project(glite-ce-blahp)|g' CMakeLists.txt && \
+    mkdir build && cd build && cmake .. && make glite-ce-blahp_rpm && \
     cp /var/lib/release/projects/BLAH/build/RPM/RPMS/x86_64/*.rpm \
        /var/lib/release/dist/CREAM/sl6/x86_64/base
 
