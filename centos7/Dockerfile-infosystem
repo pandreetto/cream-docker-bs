@@ -1,0 +1,55 @@
+###############################################################################
+#  infosystem
+#
+#  Required arguments:
+#    info_generic_version
+#    info_pbs_version
+#    info_slurm_version
+#    info_lsf_version
+#    info_condor_version
+#
+###############################################################################
+
+FROM cream-service
+
+ARG info_generic_version
+ARG info_pbs_version
+ARG info_slurm_version
+ARG info_lsf_version
+ARG info_condor_version
+
+LABEL info.generic.version=${info_generic_version} \
+      info.pbs.version=${info_pbs_version} \
+      info.slurm.version=${info_slurm_version} \
+      info.lsf.version=${info_lsf_version} \
+      info.condor.version=${info_condor_version}
+
+RUN git clone https://github.com/italiangrid/info-dynamic-scheduler-generic /var/lib/release/projects/info-dynamic-scheduler-generic && \
+    cd /var/lib/release/projects/info-dynamic-scheduler-generic && git checkout ${info_generic_version} && \
+    python setup.py bdist_rpm && \
+    cp /var/lib/release/projects/info-dynamic-scheduler-generic/build/bdist.linux-x86_64/rpmbuild/RPMS/noarch/*.rpm \
+       /var/lib/release/dist/CREAM/centos7/noarch/base
+
+RUN git clone https://github.com/italiangrid/info-dynamic-scheduler-pbs /var/lib/release/projects/info-dynamic-scheduler-pbs && \
+    cd /var/lib/release/projects/info-dynamic-scheduler-pbs && git checkout ${info_pbs_version} && \
+    python setup.py bdist_rpm && \
+    cp /var/lib/release/projects/info-dynamic-scheduler-pbs/build/bdist.linux-x86_64/rpmbuild/RPMS/noarch/*.rpm \
+       /var/lib/release/dist/CREAM/centos7/noarch/base
+
+RUN git clone https://github.com/italiangrid/info-dynamic-scheduler-slurm /var/lib/release/projects/info-dynamic-scheduler-slurm && \
+    cd /var/lib/release/projects/info-dynamic-scheduler-slurm && git checkout ${info_slurm_version} && \
+    python setup.py bdist_rpm && \
+    cp /var/lib/release/projects/info-dynamic-scheduler-slurm/build/bdist.linux-x86_64/rpmbuild/RPMS/noarch/*.rpm \
+       /var/lib/release/dist/CREAM/centos7/noarch/base
+
+RUN git clone https://github.com/schwicke/info.dynamic-scheduler-lsf /var/lib/release/projects/info-dynamic-scheduler-lsf && \
+    cd /var/lib/release/projects/info-dynamic-scheduler-lsf && git checkout ${info_lsf_version} && \
+    ./autogen.sh && ./configure && make rpm && \
+    cp ~/rpmbuild/RPMS/noarch/info-dynamic-scheduler-lsf-*.rpm /var/lib/release/dist/CREAM/centos7/noarch/base
+
+RUN git clone https://github.com/italiangrid/glite-condor-infoprovider /var/lib/release/projects/glite-condor-infoprovider && \
+    cd /var/lib/release/projects/glite-condor-infoprovider && git checkout ${info_condor_version} && make rpm && \
+    cp /var/lib/release/projects/glite-condor-infoprovider/RPMS/noarch/*.rpm \
+       /var/lib/release/dist/CREAM/centos7/noarch/base
+
+

@@ -1,0 +1,63 @@
+#!/bin/bash
+
+PKGVER=0.0.1
+PKGREL=1
+
+mkdir -p  rpmbuild/RPMS
+mkdir -p  rpmbuild/SRPMS/
+mkdir -p  rpmbuild/SPECS/
+mkdir -p  rpmbuild/SOURCES/
+mkdir -p  rpmbuild/BUILD/
+
+cat << EOF >> README
+
+Patch for condor-classads and BLAH
+
+EOF
+
+cat << EOF >> rpmbuild/SPECS/condor-classads-blah-patch.spec
+Summary: Patch for condor-classads and BLAH
+Name: condor-classads-blah-patch
+Version: ${PKGVER}
+Release: ${PKGREL}%{?dist}
+License: Apache License 2.0
+Vendor: EMI
+Group: System Environment/Libraries
+Packager: CREAM build system
+BuildArch: x86_64
+Requires: condor-classads >= 8.6.1
+Provides: libclassad.so.7()(64bit)
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+AutoReqProv: yes
+Source: condor-classads-blah-patch.tar.gz
+
+%description
+This package contains patches and workaround for classads
+to be used with BLAH
+
+%prep
+
+%setup -c -q
+
+%install
+rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/lib64
+cd %{buildroot}/usr/lib64
+ln -sf libclassad.so.8 libclassad.so.7
+
+%clean
+rm -rf %{buildroot}
+
+%files
+%defattr(-,root,root)
+/usr/lib64/libclassad.so.7
+
+
+%changelog
+* Thu Jun 1 2017 CREAM group <cream-support@lists.infn.it> - ${PKGVER}-${PKGREL}
+- Initial release
+EOF
+
+tar -zcf rpmbuild/SOURCES/condor-classads-blah-patch.tar.gz README
+rpmbuild -ba --define "_topdir ${PWD}/rpmbuild" rpmbuild/SPECS/condor-classads-blah-patch.spec
+

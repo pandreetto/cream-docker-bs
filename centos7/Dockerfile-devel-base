@@ -1,0 +1,37 @@
+###############################################################################
+#  devel-base
+###############################################################################
+
+FROM centos:centos7
+
+RUN yum -y install wget epel-release && \
+    rpm --import http://htcondor.org/yum/RPM-GPG-KEY-HTCondor && \
+    wget -O /etc/yum.repos.d/htcondor.repo http://igi-01.pd.infn.it/mrepo/dist/HTCondor/repos/centos7/htcondor.repo
+
+RUN yum -y install cmake createrepo gcc-c++ git doxygen chrpath docbook-style-xsl \
+                   make maven pkgconfig rpm-build libxslt libxml2-devel boost-devel c-ares-devel \
+                   condor-classads-devel glite-jobid-api-c-devel glite-jobid-api-cpp-devel log4cpp-devel \
+                   glite-lbjp-common-gsoap-plugin-devel globus-callout-devel globus-common-devel \
+                   globus-ftp-client-devel globus-ftp-control-devel globus-gsi-callback-devel \
+                   globus-gsi-cert-utils-devel globus-gsi-credential-devel globus-gsi-openssl-error-devel \
+                   globus-gsi-proxy-core-devel globus-gsi-proxy-ssl-devel globus-gsi-sysconfig-devel \
+                   globus-gssapi-error-devel globus-gssapi-gsi-devel globus-gss-assist-devel \
+                   globus-openssl-module-devel gridsite-devel gsoap-devel java-1.7.0-openjdk-devel voms-devel \
+                   automake autoconf libtool perl-TimeDate perl-ExtUtils-MakeMaker perl-Test-Simple
+
+RUN mkdir -p /var/lib/release/projects \
+             /var/lib/release/dist/CREAM/centos7/noarch/base \
+             /var/lib/release/dist/CREAM/centos7/noarch/third-party \
+             /var/lib/release/dist/CREAM/centos7/x86_64/base \
+             /var/lib/release/dist/CREAM/centos7/x86_64/third-party \
+             /var/lib/release/dist/CREAM-UI/centos7/x86_64/base \
+             /var/lib/release/dist/CREAM-UI/centos7/x86_64/third-party
+
+RUN git clone https://github.com/italiangrid/cream-interface /var/lib/release/projects/cream-interface && \
+    cd /var/lib/release/projects/cream-interface && ./compile rpm && \
+    rpm -i /var/lib/release/projects/cream-interface/rpmbuild/RPMS/noarch/*.rpm && \
+    cp /var/lib/release/projects/cream-interface/rpmbuild/RPMS/noarch/*.rpm \
+       /var/lib/release/dist/CREAM/centos7/noarch/base
+
+
+

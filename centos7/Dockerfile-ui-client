@@ -1,0 +1,40 @@
+###############################################################################
+#  ui-client
+#
+#  Required arguments:
+#    jdl_apic_version
+#    cream_apic_version
+#    cream.cli.version
+#
+###############################################################################
+
+FROM ui-base
+
+ARG jdl_apic_version
+ARG cream_apic_version
+ARG cream_cli_version
+
+LABEL jdl.apic.version=${jdl_apic_version} \
+      cream.apic.version=${cream_apic_version} \
+      cream.cli.version=${cream_cli_version}
+
+RUN git clone https://github.com/italiangrid/jdl-api-cpp /var/lib/release/projects/jdl-api-cpp && \
+    cd /var/lib/release/projects/jdl-api-cpp && git checkout ${jdl_apic_version} && \
+    mkdir build && cd build && cmake .. && make rpm && \
+    rpm -i /var/lib/release/projects/jdl-api-cpp/build/rpmbuild/RPMS/x86_64/*.rpm && \
+    cp /var/lib/release/projects/jdl-api-cpp/build/rpmbuild/RPMS/x86_64/*.rpm \
+       /var/lib/release/dist/CREAM-UI/centos7/x86_64/base
+
+RUN git clone https://github.com/italiangrid/cream-client-api-c /var/lib/release/projects/cream-client-api-c && \
+    cd /var/lib/release/projects/cream-client-api-c && git checkout ${cream_apic_version} && \
+    mkdir build && cd build && cmake .. && make rpm && \
+    rpm -i /var/lib/release/projects/cream-client-api-c/build/rpmbuild/RPMS/x86_64/*.rpm && \
+    cp /var/lib/release/projects/cream-client-api-c/build/rpmbuild/RPMS/x86_64/*.rpm \
+       /var/lib/release/dist/CREAM-UI/centos7/x86_64/base
+
+RUN git clone https://github.com/italiangrid/cream-cli /var/lib/release/projects/cream-cli && \
+    cd /var/lib/release/projects/cream-cli && git checkout ${cream_cli_version} && \
+    mkdir build && cd build && cmake .. && make rpm && \
+    cp /var/lib/release/projects/cream-cli/build/rpmbuild/RPMS/x86_64/*.rpm \
+       /var/lib/release/dist/CREAM-UI/centos7/x86_64/base
+
