@@ -19,10 +19,36 @@ pipeline {
             }
 
             steps {
+
+                /* job-manager exception */
                 sh 'git clone https://github.com/italiangrid/jobman-exception /var/lib/release/projects/jobman-exception'
                 sh 'cd /var/lib/release/projects/jobman-exception && git checkout ${params.jobman_tag} && mkdir build && cd build && cmake .. && make rpm'
                 sh 'rpm -i /var/lib/release/projects/jobman-exception/build/rpmbuild/RPMS/x86_64/*.rpm'
                 sh 'cp /var/lib/release/projects/jobman-exception/build/rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM-UI/centos7/x86_64/base'
+
+                /* classad utils */
+                sh 'git clone https://github.com/italiangrid/classad-utils /var/lib/release/projects/classad-utils'
+                sh 'cd /var/lib/release/projects/classad-utils && git checkout ${params.classad_utils_tag} && mkdir build && cd build && cmake .. && make rpm'
+                sh 'rpm -i /var/lib/release/projects/classad-utils/build/rpmbuild/RPMS/x86_64/*.rpm'
+                sh 'cp /var/lib/release/projects/classad-utils/build/rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM-UI/centos7/x86_64/base'
+
+                /* jdl api-c */
+                sh 'git clone https://github.com/italiangrid/jdl-api-cpp /var/lib/release/projects/jdl-api-cpp'
+                sh 'cd /var/lib/release/projects/jdl-api-cpp && git checkout ${params.jdlapic_tag} && mkdir build && cd build && cmake .. && make rpm'
+                sh 'rpm -i /var/lib/release/projects/jdl-api-cpp/build/rpmbuild/RPMS/x86_64/*.rpm'
+                sh 'cp /var/lib/release/projects/jdl-api-cpp/build/rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM-UI/centos7/x86_64/base'
+
+                /* cream client api */
+                sh 'git clone https://github.com/italiangrid/cream-client-api-c /var/lib/release/projects/cream-client-api-c'
+                sh 'cd /var/lib/release/projects/cream-client-api-c && git checkout ${params.creamapic_tag} && mkdir build && cd build && cmake .. && make rpm'
+                sh 'rpm -i /var/lib/release/projects/cream-client-api-c/build/rpmbuild/RPMS/x86_64/*.rpm'
+                sh 'cp /var/lib/release/projects/cream-client-api-c/build/rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM-UI/centos7/x86_64/base'
+
+                /* cream client */
+                sh 'git clone https://github.com/italiangrid/cream-cli /var/lib/release/projects/cream-cli'
+                sh 'cd /var/lib/release/projects/cream-cli && git checkout ${params.creamcli_tag} && mkdir build && cd build && cmake .. && make rpm'
+                sh 'cp /var/lib/release/projects/cream-cli/build/rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM-UI/centos7/x86_64/base'
+
             }
 
         }
@@ -34,10 +60,36 @@ pipeline {
             }
 
             steps {
+
+                /* job-manager exception */
                 sh 'git clone https://github.com/italiangrid/jobman-exception /var/lib/release/projects/jobman-exception'
                 sh 'cd /var/lib/release/projects/jobman-exception && git checkout ${params.jobman_tag} && mkdir build && cd build && cmake .. && make rpm'
                 sh 'rpm -i /var/lib/release/projects/jobman-exception/build/rpmbuild/RPMS/x86_64/*.rpm'
                 sh 'cp /var/lib/release/projects/jobman-exception/build/rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM-UI/sl6/x86_64/base'
+
+                /* classad utils */
+                sh 'git clone https://github.com/italiangrid/classad-utils /var/lib/release/projects/classad-utils'
+                sh 'cd /var/lib/release/projects/classad-utils && git checkout ${params.classad_utils_tag} && mkdir build && cd build && cmake .. && make rpm'
+                sh 'rpm -i /var/lib/release/projects/classad-utils/build/rpmbuild/RPMS/x86_64/*.rpm'
+                sh 'cp /var/lib/release/projects/classad-utils/build/rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM-UI/sl6/x86_64/base'
+
+                /* jdl api-c */
+                sh 'git clone https://github.com/italiangrid/jdl-api-cpp /var/lib/release/projects/jdl-api-cpp'
+                sh 'cd /var/lib/release/projects/jdl-api-cpp && git checkout ${params.jdlapic_tag} && mkdir build && cd build && cmake .. && make rpm'
+                sh 'rpm -i /var/lib/release/projects/jdl-api-cpp/build/rpmbuild/RPMS/x86_64/*.rpm'
+                sh 'cp /var/lib/release/projects/jdl-api-cpp/build/rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM-UI/sl6/x86_64/base'
+
+                /* cream client api */
+                sh 'git clone https://github.com/italiangrid/cream-client-api-c /var/lib/release/projects/cream-client-api-c'
+                sh 'cd /var/lib/release/projects/cream-client-api-c && git checkout ${params.creamapic_tag} && mkdir build && cd build && cmake .. && make rpm'
+                sh 'rpm -i /var/lib/release/projects/cream-client-api-c/build/rpmbuild/RPMS/x86_64/*.rpm'
+                sh 'cp /var/lib/release/projects/cream-client-api-c/build/rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM-UI/sl6/x86_64/base'
+
+                /* cream client */
+                sh 'git clone https://github.com/italiangrid/cream-cli /var/lib/release/projects/cream-cli'
+                sh 'cd /var/lib/release/projects/cream-cli && git checkout ${params.creamcli_tag} && mkdir build && cd build && cmake .. && make rpm'
+                sh 'cp /var/lib/release/projects/cream-cli/build/rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM-UI/sl6/x86_64/base'
+
             }
 
         }
