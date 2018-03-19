@@ -2,6 +2,7 @@
 #  service-base
 #
 #  Required arguments:
+#    cream_parent_version
 #    jdlapij_version
 #    cream_utils_version
 #
@@ -9,14 +10,16 @@
 
 FROM devel-base:centos7
 
+ARG cream_parent_version
 ARG jdlapij_version
 ARG cream_utils_version
 
-LABEL jdl.api.java.version=${jdlapij_version} \
+LABEL cream.parent.version=${cream_parent_version} \
+      jdl.api.java.version=${jdlapij_version} \
       cream.utils.version=${cream_utils_version}
 
 RUN git clone https://github.com/italiangrid/cream-parent /var/lib/release/projects/cream-parent && \
-    cd /var/lib/release/projects/cream-parent && mvn install
+    cd /var/lib/release/projects/cream-parent && git checkout ${cream_parent_version} && mvn install
 
 RUN git clone https://github.com/italiangrid/jdl-api-java /var/lib/release/projects/jdl-api-java && \
     cd /var/lib/release/projects/jdl-api-java && git checkout ${jdlapij_version} && \

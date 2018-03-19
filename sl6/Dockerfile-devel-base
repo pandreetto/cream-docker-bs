@@ -6,7 +6,7 @@ FROM amd64/sl:6
 
 RUN yum -y install wget epel-release
 
-RUN yum -y install cmake createrepo gcc-c++ git doxygen chrpath docbook-style-xsl \
+RUN yum -y install cmake createrepo gcc-c++ git doxygen chrpath docbook-style-xsl yum-utils \
                    make maven pkgconfig rpm-build libxslt libxml2-devel boost-devel c-ares-devel \
                    classads-devel glite-jobid-api-c-devel glite-jobid-api-cpp-devel log4cpp-devel \
                    glite-lbjp-common-gsoap-plugin-devel globus-callout-devel globus-common-devel \
