@@ -1,0 +1,46 @@
+pipeline {
+
+    agent none
+
+    parameters {
+        string(name: 'jobman_tag', defaultValue: 'master', description: 'Tag for job manager API')
+        string(name: 'classad_utils_tag', defaultValue: 'master', description: 'Tag for classad util API')
+        string(name: 'jdlapic_tag', defaultValue: 'master', description: 'Tag for JDL API')
+        string(name: 'creamapic_tag', defaultValue: 'master', description: 'Tag for CREAM client API')
+        string(name: 'creamcli_tag', defaultValue: 'master', description: 'Tag for CREAM client')
+    }
+
+    stages {
+
+        stage('Build on CentOS7') {
+
+            agent {
+                docker { image 'infnpd/cream-devel-env:centos7' }
+            }
+
+            steps {
+                sh 'git clone https://github.com/italiangrid/jobman-exception /var/lib/release/projects/jobman-exception'
+                sh 'cd /var/lib/release/projects/jobman-exception && git checkout ${params.jobman_tag} && mkdir build && cd build && cmake .. && make rpm'
+                sh 'rpm -i /var/lib/release/projects/jobman-exception/build/rpmbuild/RPMS/x86_64/*.rpm'
+                sh 'cp /var/lib/release/projects/jobman-exception/build/rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM-UI/centos7/x86_64/base'
+            }
+
+        }
+
+        stage('Build on SL6') {
+
+            agent {
+                docker { image 'infnpd/cream-devel-env:sl6' }
+            }
+
+            steps {
+                sh 'git clone https://github.com/italiangrid/jobman-exception /var/lib/release/projects/jobman-exception'
+                sh 'cd /var/lib/release/projects/jobman-exception && git checkout ${params.jobman_tag} && mkdir build && cd build && cmake .. && make rpm'
+                sh 'rpm -i /var/lib/release/projects/jobman-exception/build/rpmbuild/RPMS/x86_64/*.rpm'
+                sh 'cp /var/lib/release/projects/jobman-exception/build/rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM-UI/sl6/x86_64/base'
+            }
+
+        }
+
+    }
+}
