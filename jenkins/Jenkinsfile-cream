@@ -1,0 +1,99 @@
+pipeline {
+
+    agent none
+
+    parameters {
+        string(name: 'parent_tag', defaultValue: 'master', description: 'Tag for CREAM parent')
+        string(name: 'jdl_api_tag', defaultValue: 'master', description: 'Tag for JDL API java')
+        string(name: 'utils_tag', defaultValue: 'master', description: 'Tag for CREAM utilities')
+        string(name: 'common_tag', defaultValue: 'master', description: 'Tag for CREAM common library')
+        string(name: 'creamapi_tag', defaultValue: 'master', description: 'Tag for CREAM API')
+        string(name: 'cream_tag', defaultValue: 'master', description: 'Tag for CREAM service')
+    }
+
+    stages {
+
+        stage('Build on CentOS7') {
+
+            agent {
+                docker {
+                    image 'infnpd/cream-devel-mvn:1.0.3-centos7'
+                    args '-u 0:0'
+                }
+            }
+
+            steps {
+
+                sh "git clone https://github.com/italiangrid/cream-parent /var/lib/release/projects/cream-parent"
+                sh "cd /var/lib/release/projects/cream-parent && git checkout ${params.parent_tag} && mvn install"
+
+                sh "git clone https://github.com/italiangrid/jdl-api-java /var/lib/release/projects/jdl-api-java"
+                sh "cd /var/lib/release/projects/jdl-api-java && git checkout ${params.jdl_api_tag } && mvn -q -Drpm.repackaging=true -DskipTests install"
+                sh "cp /var/lib/release/projects/jdl-api-java/target/rpmbuild/RPMS/noarch/*.rpm /var/lib/release/dist/CREAM/centos7/noarch/base"
+
+                sh "git clone https://github.com/italiangrid/cream-utils /var/lib/release/projects/cream-utils"
+                sh "cd /var/lib/release/projects/cream-utils && git checkout ${params.utils_tag} && mkdir build && cd build && cmake .. && make rpm"
+                sh "cp /var/lib/release/projects/cream-utils/build/rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM/centos7/x86_64/base"
+
+                sh "git clone https://github.com/italiangrid/cream-common /var/lib/release/projects/cream-common"
+                sh "cd /var/lib/release/projects/cream-common && git checkout ${params.common_tag} && mvn -q -Drpm.repackaging=true -DskipTests install"
+                sh "cp /var/lib/release/projects/cream-common/target/rpmbuild/RPMS/noarch/*.rpm /var/lib/release/dist/CREAM/centos7/noarch/base"
+
+                sh "git clone https://github.com/italiangrid/cream-api-java /var/lib/release/projects/cream-api-java"
+                sh "cd /var/lib/release/projects/cream-api-java && git checkout ${params.creamapi_tag} && mvn -q -Drpm.repackaging=true -DskipTests install"
+                sh "cp /var/lib/release/projects/cream-api-java/target/rpmbuild/RPMS/noarch/*.rpm /var/lib/release/dist/CREAM/centos7/noarch/base"
+
+                sh "git clone https://github.com/italiangrid/cream /var/lib/release/projects/cream"
+                sh "cd /var/lib/release/projects/cream && git checkout ${params.cream_tag} && mvn -q -Drpm.repackaging=true -DskipTests install"
+                sh "cp /var/lib/release/projects/cream/target/rpmbuild/RPMS/noarch/*.rpm /var/lib/release/dist/CREAM/centos7/noarch/base"
+
+                sh "createrepo /var/lib/release/dist/CREAM/centos7/x86_64/base"
+                sh "createrepo /var/lib/release/dist/CREAM/centos7/noarch/base"
+
+            }
+
+        }
+
+        stage('Build on SL6') {
+
+            agent {
+                docker {
+                    image 'infnpd/cream-devel-mvn:1.0.3-sl6'
+                    args '-u 0:0'
+                }
+            }
+
+            steps {
+
+                sh "git clone https://github.com/italiangrid/cream-parent /var/lib/release/projects/cream-parent"
+                sh "cd /var/lib/release/projects/cream-parent && git checkout ${params.parent_tag} && mvn install"
+
+                sh "git clone https://github.com/italiangrid/jdl-api-java /var/lib/release/projects/jdl-api-java"
+                sh "cd /var/lib/release/projects/jdl-api-java && git checkout ${params.jdl_api_tag } && mvn -Drpm.repackaging=true -DskipTests install"
+                sh "cp /var/lib/release/projects/jdl-api-java/target/rpmbuild/RPMS/noarch/*.rpm /var/lib/release/dist/CREAM/sl6/noarch/base"
+
+                sh "git clone https://github.com/italiangrid/cream-utils /var/lib/release/projects/cream-utils"
+                sh "cd /var/lib/release/projects/cream-utils && git checkout ${params.utils_tag} && mkdir build && cd build && cmake .. && make rpm"
+                sh "cp /var/lib/release/projects/cream-utils/build/rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM/sl6/x86_64/base"
+
+                sh "git clone https://github.com/italiangrid/cream-common /var/lib/release/projects/cream-common"
+                sh "cd /var/lib/release/projects/cream-common && git checkout ${params.common_tag} && mvn -q -Drpm.repackaging=true -DskipTests install"
+                sh "cp /var/lib/release/projects/cream-common/target/rpmbuild/RPMS/noarch/*.rpm /var/lib/release/dist/CREAM/sl6/noarch/base"
+
+                sh "git clone https://github.com/italiangrid/cream-api-java /var/lib/release/projects/cream-api-java"
+                sh "cd /var/lib/release/projects/cream-api-java && git checkout ${params.creamapi_tag} && mvn -q -Drpm.repackaging=true -DskipTests install"
+                sh "cp /var/lib/release/projects/cream-api-java/target/rpmbuild/RPMS/noarch/*.rpm /var/lib/release/dist/CREAM/sl6/noarch/base"
+
+                sh "git clone https://github.com/italiangrid/cream /var/lib/release/projects/cream"
+                sh "cd /var/lib/release/projects/cream && git checkout ${params.cream_tag} && mvn -q -Drpm.repackaging=true -DskipTests install"
+                sh "cp /var/lib/release/projects/cream/target/rpmbuild/RPMS/noarch/*.rpm /var/lib/release/dist/CREAM/sl6/noarch/base"
+
+                sh "createrepo /var/lib/release/dist/CREAM/sl6/x86_64/base"
+                sh "createrepo /var/lib/release/dist/CREAM/sl6/noarch/base"
+
+            }
+
+        }
+
+    }
+}
