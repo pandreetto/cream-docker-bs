@@ -3,12 +3,14 @@ pipeline {
     agent none
 
     parameters {
-        string(name: 'parent_tag', defaultValue: 'master', description: 'Tag for CREAM parent')
+        string(name: 'parent_version', defaultValue: '1.0.3', description: 'Version of the CREAM parent')
         string(name: 'jdl_api_tag', defaultValue: 'master', description: 'Tag for JDL API java')
         string(name: 'utils_tag', defaultValue: 'master', description: 'Tag for CREAM utilities')
         string(name: 'common_tag', defaultValue: 'master', description: 'Tag for CREAM common library')
         string(name: 'creamapi_tag', defaultValue: 'master', description: 'Tag for CREAM API')
         string(name: 'cream_tag', defaultValue: 'master', description: 'Tag for CREAM service')
+        string(name: 'canlt_tag', defaultValue: 'master', description: 'Tag for CAnL tomcat plugin')
+        string(name: 'blah_tag', defaultValue: 'master', description: 'Tag for BLAH')
     }
 
     stages {
@@ -17,15 +19,16 @@ pipeline {
 
             agent {
                 docker {
-                    image 'infnpd/cream-devel-mvn:1.0.3-centos7'
+                    image "infnpd/cream-devel-mvn:${params.parent_version}-centos7"
                     args '-u 0:0'
                 }
             }
 
             steps {
 
+                /* workaround */
                 sh "git clone https://github.com/italiangrid/cream-parent /var/lib/release/projects/cream-parent"
-                sh "cd /var/lib/release/projects/cream-parent && git checkout ${params.parent_tag} && mvn install"
+                sh "cd /var/lib/release/projects/cream-parent && mvn install"
 
                 sh "git clone https://github.com/italiangrid/jdl-api-java /var/lib/release/projects/jdl-api-java"
                 sh "cd /var/lib/release/projects/jdl-api-java && git checkout ${params.jdl_api_tag } && mvn -q -Drpm.repackaging=true -DskipTests install"
@@ -47,6 +50,16 @@ pipeline {
                 sh "cd /var/lib/release/projects/cream && git checkout ${params.cream_tag} && mvn -q -Drpm.repackaging=true -DskipTests install"
                 sh "cp /var/lib/release/projects/cream/target/rpmbuild/RPMS/noarch/*.rpm /var/lib/release/dist/CREAM/centos7/noarch/base"
 
+                sh "git clone https://github.com/pandreetto/canl-java-tomcat /var/lib/release/projects/canl-java-tomcat"
+                sh "cd /var/lib/release/projects/canl-java-tomcat && git checkout ${params.canlt_tag}"
+                sh "sed -i 's|/tmp/m2-repository|/root/.m2/repository|g' /var/lib/release/projects/canl-java-tomcat/maven-settings.xml"
+                sh "cd /var/lib/release/projects/canl-java-tomcat && make rpm"
+                sh "cp /var/lib/release/projects/canl-java-tomcat/rpmbuild/RPMS/noarch/*.rpm /var/lib/release/dist/CREAM/centos7/noarch/base"
+
+                sh "git clone https://github.com/prelz/BLAH /var/lib/release/projects/BLAH"
+                sh "cd /var/lib/release/projects/BLAH && git checkout ${params.blah_tag} && mkdir build && cd build && cmake .. && make BLAH_rpm"
+                sh "cp /var/lib/release/projects/BLAH/build/RPM/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM/centos7/x86_64/base"
+
                 sh "createrepo /var/lib/release/dist/CREAM/centos7/x86_64/base"
                 sh "createrepo /var/lib/release/dist/CREAM/centos7/noarch/base"
 
@@ -58,15 +71,16 @@ pipeline {
 
             agent {
                 docker {
-                    image 'infnpd/cream-devel-mvn:1.0.3-sl6'
+                    image "infnpd/cream-devel-mvn:${params.parent_version}-sl6"
                     args '-u 0:0'
                 }
             }
 
             steps {
 
+                /* workaround */
                 sh "git clone https://github.com/italiangrid/cream-parent /var/lib/release/projects/cream-parent"
-                sh "cd /var/lib/release/projects/cream-parent && git checkout ${params.parent_tag} && mvn install"
+                sh "cd /var/lib/release/projects/cream-parent && mvn install"
 
                 sh "git clone https://github.com/italiangrid/jdl-api-java /var/lib/release/projects/jdl-api-java"
                 sh "cd /var/lib/release/projects/jdl-api-java && git checkout ${params.jdl_api_tag } && mvn -Drpm.repackaging=true -DskipTests install"
@@ -87,6 +101,18 @@ pipeline {
                 sh "git clone https://github.com/italiangrid/cream /var/lib/release/projects/cream"
                 sh "cd /var/lib/release/projects/cream && git checkout ${params.cream_tag} && mvn -q -Drpm.repackaging=true -DskipTests install"
                 sh "cp /var/lib/release/projects/cream/target/rpmbuild/RPMS/noarch/*.rpm /var/lib/release/dist/CREAM/sl6/noarch/base"
+
+                sh "git clone https://github.com/pandreetto/canl-java-tomcat /var/lib/release/projects/canl-java-tomcat"
+                sh "cd /var/lib/release/projects/canl-java-tomcat && git checkout ${params.canlt_tag}"
+                sh "sed -i 's|/tmp/m2-repository|/root/.m2/repository|g' /var/lib/release/projects/canl-java-tomcat/maven-settings.xml"
+                sh "cd /var/lib/release/projects/canl-java-tomcat && make rpm"
+                sh "cp /var/lib/release/projects/canl-java-tomcat/rpmbuild/RPMS/noarch/*.rpm /var/lib/release/dist/CREAM/sl6/noarch/base"
+
+                sh "git clone https://github.com/prelz/BLAH /var/lib/release/projects/BLAH"
+                sh "cd /var/lib/release/projects/BLAH && git checkout ${params.blah_tag}"
+                sh "sed -i 's|project(BLAH)|project(glite-ce-blahp)|g' /var/lib/release/projects/BLAH/CMakeLists.txt"
+                sh "cd /var/lib/release/projects/BLAH && mkdir build && cd build && cmake .. && make glite-ce-blahp_rpm"
+                sh "cp /var/lib/release/projects/BLAH/build/RPM/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM/sl6/x86_64/base"
 
                 sh "createrepo /var/lib/release/dist/CREAM/sl6/x86_64/base"
                 sh "createrepo /var/lib/release/dist/CREAM/sl6/noarch/base"
