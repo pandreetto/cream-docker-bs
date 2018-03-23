@@ -1,0 +1,92 @@
+def centosDistDir = "/var/lib/release/dist/CREAM/centos7/noarch/base"
+def slDistDir = "/var/lib/release/dist/CREAM/sl6/noarch/base"
+
+pipeline {
+
+    agent none
+
+    parameters {
+        string(name: 'infogeneric_tag', defaultValue: 'master', description: 'Tag for the generic plugin')
+        string(name: 'infotorque_tag', defaultValue: 'master', description: 'Tag for TORQUE plugin')
+        string(name: 'infoslurm_tag', defaultValue: 'master', description: 'Tag for SLURM plugin')
+        string(name: 'infolsf_tag', defaultValue: 'master', description: 'Tag for LSF plugin')
+        string(name: 'infocondor_tag', defaultValue: 'master', description: 'Tag for HTCondor plugin')
+    }
+
+    stages {
+
+        stage('Build on CentOS7') {
+
+            agent {
+                docker {
+                    image "infnpd/cream-devel-env:centos7"
+                    args '-u 0:0'
+                }
+            }
+
+            steps {
+
+                sh "git clone https://github.com/italiangrid/info-dynamic-scheduler-generic /var/lib/release/projects/info-dynamic-scheduler-generic"
+                sh "cd /var/lib/release/projects/info-dynamic-scheduler-generic && git checkout ${params.infogeneric_tag} && python setup.py bdist_rpm"
+                sh "cp /var/lib/release/projects/info-dynamic-scheduler-generic/build/bdist.linux-x86_64/rpmbuild/RPMS/noarch/*.rpm ${centosDistDir}"
+
+                sh "git clone https://github.com/italiangrid/info-dynamic-scheduler-pbs /var/lib/release/projects/info-dynamic-scheduler-pbs"
+                sh "cd /var/lib/release/projects/info-dynamic-scheduler-pbs && git checkout ${params.infotorque_tag} && python setup.py bdist_rpm"
+                sh "cp /var/lib/release/projects/info-dynamic-scheduler-pbs/build/bdist.linux-x86_64/rpmbuild/RPMS/noarch/*.rpm ${centosDistDir}"
+
+                sh "git clone https://github.com/italiangrid/info-dynamic-scheduler-slurm /var/lib/release/projects/info-dynamic-scheduler-slurm"
+                sh "cd /var/lib/release/projects/info-dynamic-scheduler-slurm && git checkout ${params.infoslurm_tag} && python setup.py bdist_rpm"
+                sh "cp /var/lib/release/projects/info-dynamic-scheduler-slurm/build/bdist.linux-x86_64/rpmbuild/RPMS/noarch/*.rpm ${centosDistDir}"
+
+                sh "git clone https://github.com/schwicke/info.dynamic-scheduler-lsf /var/lib/release/projects/info-dynamic-scheduler-lsf"
+                sh "cd /var/lib/release/projects/info-dynamic-scheduler-lsf && git checkout ${params.infolsf_tag} && ./autogen.sh && ./configure && make rpm"
+                sh "cp /root/rpmbuild/RPMS/noarch/info-dynamic-scheduler-lsf-*.rpm ${centosDistDir}"
+
+                sh "git clone https://github.com/italiangrid/glite-condor-infoprovider /var/lib/release/projects/glite-condor-infoprovider"
+                sh "cd /var/lib/release/projects/glite-condor-infoprovider && git checkout ${params.infocondor_tag} && make rpm"
+                sh "cp /var/lib/release/projects/glite-condor-infoprovider/RPMS/noarch/*.rpm ${centosDistDir}"
+
+                sh "createrepo ${centosDistDir}"
+            }
+
+        }
+
+        stage('Build on SL6') {
+
+            agent {
+                docker {
+                    image "infnpd/cream-devel-env:sl6"
+                    args '-u 0:0'
+                }
+            }
+
+            steps {
+
+                sh "git clone https://github.com/italiangrid/info-dynamic-scheduler-generic /var/lib/release/projects/info-dynamic-scheduler-generic"
+                sh "cd /var/lib/release/projects/info-dynamic-scheduler-generic && git checkout ${params.infogeneric_tag} && python setup.py bdist_rpm"
+                sh "cp /var/lib/release/projects/info-dynamic-scheduler-generic/build/bdist.linux-x86_64/rpmbuild/RPMS/noarch/*.rpm ${slDistDir}"
+
+                sh "git clone https://github.com/italiangrid/info-dynamic-scheduler-pbs /var/lib/release/projects/info-dynamic-scheduler-pbs"
+                sh "cd /var/lib/release/projects/info-dynamic-scheduler-pbs && git checkout ${params.infotorque_tag} && python setup.py bdist_rpm"
+                sh "cp /var/lib/release/projects/info-dynamic-scheduler-pbs/build/bdist.linux-x86_64/rpmbuild/RPMS/noarch/*.rpm ${slDistDir}"
+
+                sh "git clone https://github.com/italiangrid/info-dynamic-scheduler-slurm /var/lib/release/projects/info-dynamic-scheduler-slurm"
+                sh "cd /var/lib/release/projects/info-dynamic-scheduler-slurm && git checkout ${params.infoslurm_tag} && python setup.py bdist_rpm"
+                sh "cp /var/lib/release/projects/info-dynamic-scheduler-slurm/build/bdist.linux-x86_64/rpmbuild/RPMS/noarch/*.rpm ${slDistDir}"
+
+                sh "git clone https://github.com/schwicke/info.dynamic-scheduler-lsf /var/lib/release/projects/info-dynamic-scheduler-lsf"
+                sh "cd /var/lib/release/projects/info-dynamic-scheduler-lsf && git checkout ${params.infolsf_tag} && ./autogen.sh && ./configure && make rpm"
+                sh "cp /root/rpmbuild/RPMS/noarch/info-dynamic-scheduler-lsf-*.rpm ${slDistDir}"
+
+                sh "git clone https://github.com/italiangrid/glite-condor-infoprovider /var/lib/release/projects/glite-condor-infoprovider"
+                sh "cd /var/lib/release/projects/glite-condor-infoprovider && git checkout ${params.infocondor_tag} && make rpm"
+                sh "cp /var/lib/release/projects/glite-condor-infoprovider/RPMS/noarch/*.rpm ${slDistDir}"
+
+                sh "createrepo ${slDistDir}"
+
+            }
+
+        }
+
+    }
+}
