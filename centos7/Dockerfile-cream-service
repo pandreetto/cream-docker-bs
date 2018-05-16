@@ -2,6 +2,9 @@
 #  cream-service
 #
 #  Required arguments:
+#    cream_parent_version
+#    jdlapij_version
+#    cream_utils_version
 #    cream_common_version
 #    cream_api_version
 #    cream_version
@@ -10,19 +13,40 @@
 #
 ###############################################################################
 
-FROM service-base:centos7
+FROM infnpd/cream-devel-mvn:1.0.3-centos7
 
+ARG cream_parent_version
+ARG jdlapij_version
+ARG cream_utils_version
 ARG cream_common_version
 ARG cream_api_version
 ARG cream_version
 ARG canl_tomcat_version
 ARG blah_version
 
-LABEL cream.common.version=${cream_common_version} \
+LABEL cream.parent.version=${cream_parent_version} \
+      jdl.api.java.version=${jdlapij_version} \
+      cream.utils.version=${cream_utils_version} \
+      cream.common.version=${cream_common_version} \
       cream.api.version=${cream_api_version} \
       cream.version=${cream_version} \
       canl.tomcat.version=${canl_tomcat_version} \
       blah.version=${blah_version}
+
+RUN git clone https://github.com/italiangrid/cream-parent /var/lib/release/projects/cream-parent && \
+    cd /var/lib/release/projects/cream-parent && git checkout ${cream_parent_version} && mvn install
+
+RUN git clone https://github.com/italiangrid/jdl-api-java /var/lib/release/projects/jdl-api-java && \
+    cd /var/lib/release/projects/jdl-api-java && git checkout ${jdlapij_version} && \
+    mvn -Drpm.repackaging=true -DskipTests install && \
+    cp /var/lib/release/projects/jdl-api-java/target/rpmbuild/RPMS/noarch/*.rpm \
+       /var/lib/release/dist/CREAM/centos7/noarch/base
+
+RUN git clone https://github.com/italiangrid/cream-utils /var/lib/release/projects/cream-utils && \
+    cd /var/lib/release/projects/cream-utils && git checkout ${cream_utils_version} && \
+    mkdir build && cd build && cmake .. && make rpm && \
+    cp /var/lib/release/projects/cream-utils/build/rpmbuild/RPMS/x86_64/*.rpm \
+       /var/lib/release/dist/CREAM/centos7/x86_64/base
 
 RUN git clone https://github.com/italiangrid/cream-common /var/lib/release/projects/cream-common && \
     cd /var/lib/release/projects/cream-common && git checkout ${cream_common_version} && \
@@ -54,8 +78,4 @@ RUN git clone https://github.com/prelz/BLAH /var/lib/release/projects/BLAH && \
     cp /var/lib/release/projects/BLAH/build/RPM/RPMS/x86_64/*.rpm \
        /var/lib/release/dist/CREAM/centos7/x86_64/base
 
-COPY build_classads-patch condor-classads-blah-patch/
-
-RUN cd condor-classads-blah-patch && ./build_classads-patch && \
-    cp rpmbuild/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM/centos7/x86_64/base
 
