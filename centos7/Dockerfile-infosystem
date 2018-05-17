@@ -52,4 +52,7 @@ RUN git clone https://github.com/italiangrid/glite-condor-infoprovider /var/lib/
     cp /var/lib/release/projects/glite-condor-infoprovider/RPMS/noarch/*.rpm \
        /var/lib/release/dist/CREAM/centos7/noarch/base
 
+RUN cd /var/lib/release/dist/CREAM/centos7/noarch/base && createrepo . && cd .. && tar zcf base.tar.gz base/
+
+RUN cd /var/lib/release/dist/CREAM/centos7/x86_64/base && createrepo . && cd .. && tar zcf base.tar.gz base/
 
