@@ -13,7 +13,7 @@
 #
 ###############################################################################
 
-FROM infnpd/cream-devel-mvn:1.0.3-sl6
+FROM infnpd/cream-devel-mvn:1.0.4-sl6
 
 ARG cream_parent_version
 ARG jdlapij_version
