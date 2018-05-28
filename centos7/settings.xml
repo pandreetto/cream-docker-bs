@@ -1,0 +1,40 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+          
+  <profiles>
+    <profile>
+      <id>igi-profile</id>
+      <activation><activeByDefault>true</activeByDefault></activation>
+
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <name>Central Repository</name>
+          <url>http://repo.maven.apache.org/maven2</url>
+          <layout>default</layout>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+          <releases>
+            <updatePolicy>never</updatePolicy>
+          </releases>
+        </pluginRepository>
+      </pluginRepositories>
+
+
+
+      <repositories>
+
+        <repository>
+          <id>repo-on-igi</id>
+          <name>Glite beta</name>
+          <url>http://igi-01.pd.infn.it/mrepo/grid-dev/maven</url>
+        </repository>
+          
+      </repositories>
+        
+    </profile>
+  </profiles>
+
+</settings>
