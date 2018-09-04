@@ -6,7 +6,7 @@ FROM centos:centos7
 
 RUN yum -y install wget epel-release && \
     rpm --import http://htcondor.org/yum/RPM-GPG-KEY-HTCondor && \
-    wget -O /etc/yum.repos.d/htcondor.repo http://igi-01.pd.infn.it/mrepo/dist/HTCondor/repos/centos7/htcondor.repo
+    wget -O /etc/yum.repos.d/htcondor.repo http://artifacts.pd.infn.it/packages/dist/HTCondor/repos/centos7/htcondor.repo
 
 RUN yum -y install cmake createrepo gcc-c++ git doxygen chrpath docbook-style-xsl yum-utils \
                    make maven pkgconfig rpm-build libxslt libxml2-devel boost-devel c-ares-devel \

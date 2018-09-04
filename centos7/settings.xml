@@ -29,7 +29,7 @@
         <repository>
           <id>repo-on-igi</id>
           <name>Glite beta</name>
-          <url>http://igi-01.pd.infn.it/mrepo/grid-dev/maven</url>
+          <url>http://artifacts.pd.infn.it/packages/grid-dev/maven</url>
         </repository>
           
       </repositories>
