@@ -21,6 +21,7 @@ ARG cream_utils_version
 ARG cream_common_version
 ARG cream_api_version
 ARG cream_version
+ARG cream_nagios_version
 ARG canl_tomcat_version
 ARG blah_version
 
@@ -30,6 +31,7 @@ LABEL cream.parent.version=${cream_parent_version} \
       cream.common.version=${cream_common_version} \
       cream.api.version=${cream_api_version} \
       cream.version=${cream_version} \
+      cream.nagios.version=${cream_nagios_version} \
       canl.tomcat.version=${canl_tomcat_version} \
       blah.version=${blah_version}
 
@@ -80,4 +82,9 @@ RUN git clone https://github.com/prelz/BLAH /var/lib/release/projects/BLAH && \
     cp /var/lib/release/projects/BLAH/build/RPM/RPMS/x86_64/*.rpm \
        /var/lib/release/dist/CREAM/centos7/x86_64/base
 
+RUN git clone https://github.com/italiangrid/cream-nagios /var/lib/release/projects/cream-nagios && \
+    cd /var/lib/release/projects/cream-nagios && git checkout ${cream_nagios_version} && \
+    python setup.py bdist_rpm && \
+    cp /var/lib/release/projects/cream-nagios/build/bdist.linux-x86_64/rpmbuild/RPMS/noarch/*.rpm \
+       /var/lib/release/dist/CREAM/centos7/noarch/base
 

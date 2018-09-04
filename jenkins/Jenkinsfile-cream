@@ -11,6 +11,7 @@ pipeline {
         string(name: 'cream_tag', defaultValue: 'master', description: 'Tag for CREAM service')
         string(name: 'canlt_tag', defaultValue: 'master', description: 'Tag for CAnL tomcat plugin')
         string(name: 'blah_tag', defaultValue: 'master', description: 'Tag for BLAH')
+        string(name: 'nagios_tag', defaultValue: 'master', description: 'Tag for CREAM nagios')
     }
 
     stages {
@@ -59,6 +60,10 @@ pipeline {
                 sh "git clone https://github.com/prelz/BLAH /var/lib/release/projects/BLAH"
                 sh "cd /var/lib/release/projects/BLAH && git checkout ${params.blah_tag} && mkdir build && cd build && cmake .. && make BLAH_rpm"
                 sh "cp /var/lib/release/projects/BLAH/build/RPM/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM/centos7/x86_64/base"
+
+                sh "git clone https://github.com/italiangrid/cream-nagios /var/lib/release/projects/cream-nagios"
+                sh "cd /var/lib/release/projects/cream-nagios && git checkout ${params.nagios_tag} && python setup.py bdist_rpm"
+                sh "cp /var/lib/release/projects/cream-nagios/build/bdist.linux-x86_64/rpmbuild/RPMS/noarch/*.rpm /var/lib/release/dist/CREAM/centos7/noarch/base"
 
                 sh "createrepo /var/lib/release/dist/CREAM/centos7/x86_64/base"
                 sh "createrepo /var/lib/release/dist/CREAM/centos7/noarch/base"
@@ -113,6 +118,10 @@ pipeline {
                 sh "sed -i 's|project(BLAH)|project(glite-ce-blahp)|g' /var/lib/release/projects/BLAH/CMakeLists.txt"
                 sh "cd /var/lib/release/projects/BLAH && mkdir build && cd build && cmake .. && make glite-ce-blahp_rpm"
                 sh "cp /var/lib/release/projects/BLAH/build/RPM/RPMS/x86_64/*.rpm /var/lib/release/dist/CREAM/sl6/x86_64/base"
+
+                sh "git clone https://github.com/italiangrid/cream-nagios /var/lib/release/projects/cream-nagios"
+                sh "cd /var/lib/release/projects/cream-nagios && git checkout ${params.nagios_tag} && python setup.py bdist_rpm"
+                sh "cp /var/lib/release/projects/cream-nagios/build/bdist.linux-x86_64/rpmbuild/RPMS/noarch/*.rpm /var/lib/release/dist/CREAM/sl6/noarch/base"
 
                 sh "createrepo /var/lib/release/dist/CREAM/sl6/x86_64/base"
                 sh "createrepo /var/lib/release/dist/CREAM/sl6/noarch/base"
